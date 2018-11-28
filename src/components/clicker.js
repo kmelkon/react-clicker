@@ -22,7 +22,8 @@ export default class Clicker extends React.Component {
       interval: 2000,
       timer: null,
       enabled: false,
-      timeout: 1000
+      timeout: 1000,
+      numberOfTimers: 0
       // callback: this.mainClick
     };
     // React antics
@@ -83,7 +84,8 @@ export default class Clicker extends React.Component {
       autoClickNumber: this.state.autoClickNumber + 1,
       btnClicks: this.state.btnClicks - this.state.autoClickPrice,
       autoClickPrice: this.state.autoClickPrice + 5,
-      enabled: true
+      enabled: true,
+      numberOfTimers: this.state.numberOfTimers + 1
     });
   }
 
@@ -102,6 +104,16 @@ export default class Clicker extends React.Component {
 
   render() {
     // use this style of defining shit from state
+    let timers = [];
+    for (let i = 0; i < this.state.numberOfTimers; i++) {
+      timers.push(
+        <ReactInterval
+          timeout={this.state.timeout}
+          enabled={this.state.enabled}
+          callback={this.mainClick}
+        />
+      );
+    }
     return (
       <div>
         <Button marginBottom={20} height={56} onClick={this.mainClick}>
@@ -109,16 +121,8 @@ export default class Clicker extends React.Component {
         </Button>
         <div>Clicks: {this.state.btnClicks}</div>
 
-        <ReactInterval
-          timeout={this.state.timeout}
-          enabled={this.state.enabled}
-          callback={this.mainClick}
-        />
-        <ReactInterval
-          timeout={this.state.timeout}
-          enabled={this.state.enabled}
-          callback={this.mainClick}
-        />
+        {/* we need a way to make autoclickers number dynamic */}
+        {timers}
 
         <div>
           {this.state.btnClicks >= 10 ? (
