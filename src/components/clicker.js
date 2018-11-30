@@ -43,20 +43,6 @@ export default class Clicker extends React.Component {
       // not used yet
       auto: null
     };
-    // React antics
-    this.mainClick = this.mainClick.bind(this);
-    this.addTen = this.addTen.bind(this);
-    this.addHundred = this.addHundred.bind(this);
-    this.buyAutoclick = this.buyAutoclick.bind(this);
-    this.buyBetterAutoclick = this.buyBetterAutoclick.bind(this);
-    this.shortenAutoClickIntervall = this.shortenAutoClickIntervall.bind(this);
-    this.buffMainClick = this.buffMainClick.bind(this);
-    this.toast = this.toast.bind(this);
-    this.createHuman = this.createHuman.bind(this);
-    this.triggerAutoclick = this.triggerAutoclick.bind(this);
-    this.gameLoop = this.gameLoop.bind(this);
-    this.triggerBetterAutoclickers = this.triggerBetterAutoclickers.bind(this);
-    this.betterHumanMaker = this.betterHumanMaker.bind(this);
   }
 
   componentDidMount() {
@@ -67,7 +53,7 @@ export default class Clicker extends React.Component {
     }, 1000);
   }
 
-  gameLoop() {
+  gameLoop = () => {
     if (this.state.enabled) {
       // cheap clicker
       this.triggerAutoclick();
@@ -84,19 +70,20 @@ export default class Clicker extends React.Component {
     ) {
       this.createHuman();
     }
-  }
+  };
+
   componentWillUnmount() {
     clearInterval(this.interval);
   }
 
   // CLICKER
-  mainClick() {
+  mainClick = () => {
     this.setState({
       btnClicks: this.state.btnClicks + this.state.mainClickIncrement
     });
-  }
+  };
 
-  buffMainClick() {
+  buffMainClick = () => {
     // user this style here too
     // const {count} = this.state;
     this.setState({
@@ -104,22 +91,22 @@ export default class Clicker extends React.Component {
       btnClicks: this.state.btnClicks - this.state.mainClickBuffPrice,
       mainClickBuffPrice: this.state.mainClickBuffPrice + 10
     });
-  }
+  };
 
-  addTen() {
+  addTen = () => {
     this.setState({
       btnClicks: this.state.btnClicks + 10
     });
-  }
+  };
 
-  addHundred() {
+  addHundred = () => {
     this.setState({
       btnClicks: this.state.btnClicks + 1000
     });
-  }
+  };
 
   // Cheapest auto clicker
-  buyAutoclick() {
+  buyAutoclick = () => {
     this.setState({
       autoClickNumber: this.state.autoClickNumber + 1,
       btnClicks: this.state.btnClicks - this.state.autoClickPrice,
@@ -130,16 +117,16 @@ export default class Clicker extends React.Component {
       auto: true,
       numberOfTimers: this.state.numberOfTimers + 1
     });
-  }
+  };
 
-  triggerAutoclick() {
+  triggerAutoclick = () => {
     this.setState({
       btnClicks: this.state.btnClicks + 1 * this.state.autoClickNumber
     });
-  }
+  };
 
   // Hipster auto clicker
-  buyBetterAutoclick() {
+  buyBetterAutoclick = () => {
     this.setState({
       betterAutoClickNumber: this.state.betterAutoClickNumber + 1,
       btnClicks: this.state.btnClicks - this.state.betterAutoClickPrice,
@@ -151,15 +138,15 @@ export default class Clicker extends React.Component {
       auto: true,
       numberOfBetterTimers: this.state.numberOfBetterTimers + 1
     });
-  }
-  triggerBetterAutoclickers() {
+  };
+  triggerBetterAutoclickers = () => {
     this.setState({
       btnClicks: this.state.btnClicks + 5 * this.state.betterAutoClickNumber
     });
-  }
+  };
 
   // HUMANS
-  createHuman() {
+  createHuman = () => {
     const { humanCounter, btnClicks, humanPrice } = this.state;
     this.setState({
       humanCounter: humanCounter + 1,
@@ -167,25 +154,25 @@ export default class Clicker extends React.Component {
       humanEnabled: true,
       auto: true
     });
-  }
+  };
 
-  betterHumanMaker() {
+  betterHumanMaker = () => {
     this.setState({
       betterHumanMakerCounter: this.state.betterHumanMakerCounter + 1,
       btnClicks: this.state.btnClicks - this.state.betterHumanMakerPrice[1],
       humanCounter:
         this.state.humanCounter - this.state.betterHumanMakerPrice[0]
     });
-  }
-  shortenAutoClickIntervall() {
+  };
+  shortenAutoClickIntervall = () => {
     // Not working
     this.setState({
       interval: Math.round(this.state.interval / 2),
       btnClicks: this.state.btnClicks - 150
     });
-  }
+  };
 
-  toast() {
+  toast = () => {
     // Change this to be conditional and dynamic
     console.log(this.state.wereFifty);
     this.setState({
@@ -194,7 +181,7 @@ export default class Clicker extends React.Component {
     if (this.state.wereFifty) {
       toaster.success("Congrats! You're good at clicking virtual buttons!");
     }
-  }
+  };
 
   render() {
     // STATES
