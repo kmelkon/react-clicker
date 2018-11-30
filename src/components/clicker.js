@@ -39,17 +39,13 @@ export default class Clicker extends React.Component {
       betterHumanMakerPrice: [10, 500],
       // 50 achievement bool
       gameOverTrigger: false,
-      wereFifty: false,
-      // not used yet
-      auto: null
+      fiftyTrigger: false
     };
   }
 
   componentDidMount() {
     this.interval = setInterval(() => {
-      if (this.state.auto) {
-        this.gameLoop();
-      }
+      this.gameLoop();
     }, 1000);
   }
 
@@ -69,6 +65,15 @@ export default class Clicker extends React.Component {
       this.state.humanCounter >= 2
     ) {
       this.createHuman();
+    }
+    // fifty trigger
+    if (this.state.btnClicks >= 50 && !this.state.fiftyTrigger) {
+      // move this into its own function
+      // toast
+      toaster.success("Congrats! You're good at clicking virtual buttons!");
+      this.setState({
+        fiftyTrigger: true
+      });
     }
   };
 
@@ -114,7 +119,6 @@ export default class Clicker extends React.Component {
         this.state.autoClickPrice * Math.pow(1.1, this.state.autoClickNumber)
       ),
       enabled: true,
-      auto: true,
       numberOfTimers: this.state.numberOfTimers + 1
     });
   };
@@ -135,7 +139,6 @@ export default class Clicker extends React.Component {
           Math.pow(1.2, this.state.betterAutoClickNumber)
       ),
       betterEnabled: true,
-      auto: true,
       numberOfBetterTimers: this.state.numberOfBetterTimers + 1
     });
   };
@@ -151,8 +154,7 @@ export default class Clicker extends React.Component {
     this.setState({
       humanCounter: humanCounter + 1,
       btnClicks: btnClicks - humanPrice,
-      humanEnabled: true,
-      auto: true
+      humanEnabled: true
     });
   };
 
@@ -173,11 +175,6 @@ export default class Clicker extends React.Component {
   };
 
   toast = () => {
-    // Change this to be conditional and dynamic
-    console.log(this.state.wereFifty);
-    this.setState({
-      wereFifty: true
-    });
     if (this.state.wereFifty) {
       toaster.success("Congrats! You're good at clicking virtual buttons!");
     }
