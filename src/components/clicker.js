@@ -61,7 +61,7 @@ export default class Clicker extends React.Component {
     // human maker
     if (
       this.state.btnClicks >= 500 &&
-      this.state.auto &&
+      this.state.humanEnabled &&
       this.state.humanCounter >= 2
     ) {
       this.createHuman();
