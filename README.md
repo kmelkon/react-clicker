@@ -1,6 +1,6 @@
 # React Clicker
-### A simple react clicker for fun
 
+### A simple react clicker for fun
 
 A basic React app that allows one to click a button to increase a number and watch it grow.
 
@@ -18,9 +18,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-
-* Node
-* Npm 
+- Node
+- Npm
 
 Type the following commands in the terminal to verify your node and npm versions
 
@@ -33,16 +32,19 @@ npm -v
 
 Follow the following steps to get development environment running.
 
-* Clone this repo
-* Install node modules using npm or yarn
+- Clone this repo
+- Install node modules using npm or yarn
 
 ```bash
 cd react-clicker
 npm install
 ```
-   
+
 ## ⏰ TODO
-- [ ] Add items to the todo list
+
+- [ ] Add localstorage
+- [ ] Add achievemnts
+- [ ] Add styles
 
 ## 🖐 Contributing
 

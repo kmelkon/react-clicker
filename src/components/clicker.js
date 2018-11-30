@@ -1,10 +1,6 @@
 import React from "react";
 import { Button, Pane, toaster } from "evergreen-ui";
-import ReactInterval from "react-interval";
-
 import "./clicker.css";
-
-// add a number of bla/second
 
 export default class Clicker extends React.Component {
   constructor(props) {
@@ -35,8 +31,12 @@ export default class Clicker extends React.Component {
       numberOfBetterTimers: 0,
       // HUMANS
       humanCounter: 0,
+      humanPrice: 500,
       humanTimeout: 1000,
       humanEnabled: false,
+      betterHumanMakerCounter: 1,
+      // betterhumanmakers cost humans & clicks in that order UNTIL I FIGURE OUT HOW TO ADD KEYS
+      betterHumanMakerPrice: [10, 500],
       // 50 achievement bool
       gameOverTrigger: false,
       wereFifty: false,
@@ -54,20 +54,39 @@ export default class Clicker extends React.Component {
     this.toast = this.toast.bind(this);
     this.createHuman = this.createHuman.bind(this);
     this.triggerAutoclick = this.triggerAutoclick.bind(this);
+    this.gameLoop = this.gameLoop.bind(this);
+    this.triggerBetterAutoclickers = this.triggerBetterAutoclickers.bind(this);
+    this.betterHumanMaker = this.betterHumanMaker.bind(this);
   }
 
   componentDidMount() {
-    // this.interval = setInterval(() => {
-    //   if (this.state.auto) {
-    //     this.setState({
-    //       btnClicks: this.state.btnClicks + this.state.autoClickNumber
-    //     });
-    //   }
-    // }, this.state.interval);
+    this.interval = setInterval(() => {
+      if (this.state.auto) {
+        this.gameLoop();
+      }
+    }, 1000);
   }
 
+  gameLoop() {
+    if (this.state.enabled) {
+      // cheap clicker
+      this.triggerAutoclick();
+    }
+    if (this.state.betterEnabled) {
+      // better clicker
+      this.triggerBetterAutoclickers();
+    }
+    // human maker
+    if (
+      this.state.btnClicks >= 500 &&
+      this.state.auto &&
+      this.state.humanCounter >= 2
+    ) {
+      this.createHuman();
+    }
+  }
   componentWillUnmount() {
-    // clearInterval(this.interval);
+    clearInterval(this.interval);
   }
 
   // CLICKER
@@ -104,16 +123,18 @@ export default class Clicker extends React.Component {
     this.setState({
       autoClickNumber: this.state.autoClickNumber + 1,
       btnClicks: this.state.btnClicks - this.state.autoClickPrice,
-      autoClickPrice: Math.round(this.state.autoClickPrice * 1.15),
+      autoClickPrice: Math.floor(
+        this.state.autoClickPrice * Math.pow(1.1, this.state.autoClickNumber)
+      ),
       enabled: true,
+      auto: true,
       numberOfTimers: this.state.numberOfTimers + 1
     });
   }
 
-  // fix this equation so it makes sense and go to sleep
   triggerAutoclick() {
     this.setState({
-      btnClicks: (this.state.btnClicks + 1) * this.state.autoClickNumber
+      btnClicks: this.state.btnClicks + 1 * this.state.autoClickNumber
     });
   }
 
@@ -122,22 +143,40 @@ export default class Clicker extends React.Component {
     this.setState({
       betterAutoClickNumber: this.state.betterAutoClickNumber + 1,
       btnClicks: this.state.btnClicks - this.state.betterAutoClickPrice,
-      betterAutoClickPrice: Math.round(this.state.betterAutoClickPrice * 1.3),
+      betterAutoClickPrice: Math.floor(
+        this.state.betterAutoClickPrice *
+          Math.pow(1.2, this.state.betterAutoClickNumber)
+      ),
       betterEnabled: true,
+      auto: true,
       numberOfBetterTimers: this.state.numberOfBetterTimers + 1
+    });
+  }
+  triggerBetterAutoclickers() {
+    this.setState({
+      btnClicks: this.state.btnClicks + 5 * this.state.betterAutoClickNumber
     });
   }
 
   // HUMANS
   createHuman() {
-    const { humanCounter, btnClicks } = this.state;
+    const { humanCounter, btnClicks, humanPrice } = this.state;
     this.setState({
       humanCounter: humanCounter + 1,
-      btnClicks: btnClicks - 500,
-      humanEnabled: btnClicks >= 500 ? true : false
+      btnClicks: btnClicks - humanPrice,
+      humanEnabled: true,
+      auto: true
     });
   }
 
+  betterHumanMaker() {
+    this.setState({
+      betterHumanMakerCounter: this.state.betterHumanMakerCounter + 1,
+      btnClicks: this.state.btnClicks - this.state.betterHumanMakerPrice[1],
+      humanCounter:
+        this.state.humanCounter - this.state.betterHumanMakerPrice[0]
+    });
+  }
   shortenAutoClickIntervall() {
     // Not working
     this.setState({
@@ -159,136 +198,119 @@ export default class Clicker extends React.Component {
 
   render() {
     // STATES
-    const { btnClicks, humanCounter, humanEnabled, humanTimeout } = this.state;
-    let timers = [];
-    // Add keys to these arrays
-    for (let i = 0; i < this.state.numberOfTimers; i++) {
-      timers.push(
-        <ReactInterval
-          timeout={this.state.timeout}
-          enabled={this.state.enabled}
-          callback={this.mainClick}
-        />
-      );
-    }
-    let betterTimers = [];
-    for (let i = 0; i < this.state.numberOfBetterTimers; i++) {
-      betterTimers.push(
-        <ReactInterval
-          timeout={this.state.betterTimeout}
-          enabled={this.state.betterEnabled}
-          callback={this.mainClick}
-        />
-      );
-    }
-    // let humans = [];
-    // for (let i = 0; i < humanCounter; i++) {
-    //   humans.push(
-    //     <ReactInterval
-    //       key={i}
-    //       timeout={humanTimeout}
-    //       enabled={humanEnabled}
-    //       callback={this.createHuman}
-    //     />
-    //   );
-    // }
+    const {
+      btnClicks,
+      humanCounter,
+      humanEnabled,
+      humanTimeout,
+      betterHumanMakerCounter,
+      humanPrice
+    } = this.state;
+    // no more making instances of timers, we use a gameloop now boys
 
     return (
       <div>
-        {/* we need a way to make autoclickers number dynamic */}
-        {/* {timers} */}
-        {betterTimers}
-        {/* {humans} */}
-        <ReactInterval
-          timeout={this.state.timeout}
-          enabled={this.state.enabled}
-          callback={this.triggerAutoclick}
-        />
-        <ReactInterval
-          timeout={humanTimeout}
-          enabled={humanEnabled}
-          callback={this.createHuman}
-        />
-        <Pane display="flex" background="tint2" padding={20}>
-          <Button margin={10} height={40} onClick={this.mainClick}>
+        {/* add this to the gameloop */}
+        <Pane
+          display="flex"
+          background="tint2"
+          padding={20}
+          justifyContent="space-between"
+        >
+          <Button height={40} onClick={this.mainClick}>
             Click me!
           </Button>
-          <h2>Clicks: {Math.round(btnClicks)}</h2>
+          <h4>Clicks: {Math.round(btnClicks)}</h4>
 
           <Button
-            margin={10}
             height={40}
             onClick={this.createHuman}
             disabled={!(btnClicks >= 5000)}
             // display="none"
+            style={{ opacity: !(btnClicks >= 5000) ? 0.5 : 1 }}
           >
-            Create Human 😐
+            Create Human 😐 cost: {humanPrice} Clicks
           </Button>
-          <h2>{humanCounter > 0 && <div>Humans: {humanCounter}</div>}</h2>
+          <h4>{humanCounter > 0 && <div>Humans: {humanCounter}</div>}</h4>
+          <h4>
+            {humanCounter > 0 && (
+              <div>Humans/second: {humanCounter * betterHumanMakerCounter}</div>
+            )}
+          </h4>
         </Pane>
 
         <h3>Cheats!!1!</h3>
-        <div>
+        <Pane display="flex" background="tint2" padding={20}>
           <Button
-            marginBottom={20}
-            marginTop={10}
             height={20}
             onClick={this.addTen}
             // disabled={!(this.state.btnClicks >= 10)}
           >
             +10
           </Button>
-        </div>
-        <div>
           <Button
-            marginBottom={20}
             height={20}
             onClick={this.addHundred}
             // disabled={!(this.state.btnClicks >= 100)}
           >
             +1000
           </Button>
-        </div>
+        </Pane>
 
         <h3>Store</h3>
-        <div>
-          <div>
-            <Button
-              marginBottom={10}
-              marginTop={10}
-              onClick={this.buyAutoclick}
-              // we enable this button only when this statement is true
-              disabled={!(btnClicks >= this.state.autoClickPrice)}
-            >
-              auto click +1 (cost: {Math.round(this.state.autoClickPrice)}{" "}
-              clicks)
-            </Button>
-          </div>
-          <div>
-            <Button
-              marginBottom={10}
-              marginTop={10}
-              onClick={this.buyBetterAutoclick}
-              // we enable this button only when this statement is true
-              disabled={!(btnClicks >= this.state.betterAutoClickPrice)}
-            >
-              BETTER auto click +10 (cost:{" "}
-              {Math.round(this.state.betterAutoClickPrice)} clicks)
-            </Button>
-          </div>
-        </div>
+        <Pane
+          display="flex"
+          background="tint2"
+          padding={20}
+          justifyContent="space-between"
+        >
+          <Button
+            onClick={this.buyAutoclick}
+            // we enable this button only when this statement is true
+            disabled={!(btnClicks >= this.state.autoClickPrice)}
+          >
+            auto click {this.state.autoClickNumber} (cost:{" "}
+            {Math.round(this.state.autoClickPrice)} clicks)
+          </Button>
+          <h4>{this.state.autoClickNumber} /second</h4>
+          <Button
+            onClick={this.buyBetterAutoclick}
+            // we enable this button only when this statement is true
+            disabled={!(btnClicks >= this.state.betterAutoClickPrice)}
+          >
+            BETTER auto click {this.state.betterAutoClickNumber}(cost:
+            {Math.round(this.state.betterAutoClickPrice)} clicks)
+          </Button>
+          <h4>{this.state.betterAutoClickNumber * 5} /second</h4>
+        </Pane>
 
         <h3>Upgrades</h3>
-        <div>
+        <Pane
+          display="flex"
+          background="tint2"
+          padding={20}
+          justifyContent="space-between"
+        >
           <Button
-            marginBottom={10}
-            marginTop={10}
             onClick={this.buffMainClick}
             disabled={!(btnClicks >= this.state.mainClickBuffPrice)}
           >
             Buff MAIN CLICK (cost: {this.state.mainClickBuffPrice} clicks)
           </Button>
-        </div>
+          {/* add betterhumanmaker improver button */}
+          <Button
+            onClick={this.betterHumanMaker}
+            disabled={
+              !(
+                btnClicks >= this.state.betterHumanMakerPrice[1] &&
+                humanCounter >= this.state.betterHumanMakerPrice[0]
+              )
+            }
+          >
+            Better Human Maker 🇸🇦 (cost: {this.state.betterHumanMakerPrice[0]}{" "}
+            Humans & {this.state.betterHumanMakerPrice[1]} Clicks)
+          </Button>
+        </Pane>
 
         {/* <div>
           {this.state.btnClicks >= 150 && this.state.auto === "one" ? (
